@@ -1,0 +1,2764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RECAP — Project Status Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* Report color palette */
+    :root {
+      --bg: #f7f4f1;
+      --surface: #ffffff;
+      --border: #e8e0d8;
+      --primary: #401938;
+      --primary-light: #f5eff3;
+      --accent: #f58962;
+      --accent-light: #fdf1eb;
+      --forest: #193837;
+      --beige: #e1d1c1;
+      --success: #193837;
+      --warning: #d93b0b;
+      --danger: #b91c1c;
+      --text: #1e1018;
+      --muted: #7a6570;
+      --radius: 10px;
+      --shadow: 0 1px 4px rgba(64, 25, 56, .08);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    h2 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+    }
+
+    p {
+      color: var(--muted);
+      font-size: .875rem;
+    }
+
+    /* Header */
+    header {
+      background: var(--primary);
+      border-bottom: none;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-meta {
+      font-size: .8rem;
+      color: rgba(255, 255, 255, .65);
+      margin-top: 2px;
+    }
+
+    header h1 {
+      color: #ffffff;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .sprint-badge {
+      background: var(--accent);
+      color: #ffffff;
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* RECAP wordmark top-right */
+    .recap-wordmark {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: #ffffff;
+      letter-spacing: -.02em;
+      margin-left: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      background: var(--surface);
+      border-bottom: 2px solid var(--beige);
+      padding: 0 32px;
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--muted);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: color .15s, border-color .15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+
+    main {
+      padding: 28px 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* KPI row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .kpi-label {
+      font-size: .72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .kpi-value.ok {
+      color: var(--forest);
+    }
+
+    .kpi-value.warn {
+      color: var(--warning);
+    }
+
+    .kpi-value.danger {
+      color: var(--danger);
+    }
+
+    .kpi-sub {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Section intro */
+    .section-intro {
+      background: var(--beige);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 14px 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-intro h2 {
+      color: var(--primary);
+      margin-bottom: 4px;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+      border-top: 3px solid var(--beige);
+    }
+
+    .card:hover {
+      border-top-color: var(--accent);
+      box-shadow: 0 4px 16px rgba(64, 25, 56, .13);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: .9rem;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .badge {
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .badge.ok {
+      background: #d4ebe8;
+      color: var(--forest);
+    }
+
+    .badge.warn {
+      background: #fde8df;
+      color: var(--warning);
+    }
+
+    .badge.danger {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .badge.info {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .card p {
+      margin-top: 4px;
+      font-size: .82rem;
+    }
+
+    .card-hint {
+      font-size: .72rem;
+      color: var(--accent);
+      margin-top: 10px;
+      font-weight: 600;
+    }
+
+    .card-date {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Progress */
+    .progress-wrap {
+      margin: 8px 0 4px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--beige);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+      transition: width .4s ease;
+    }
+
+    .progress-fill.warn {
+      background: var(--warning);
+    }
+
+    .progress-fill.danger {
+      background: var(--danger);
+    }
+
+    .progress-fill.ok {
+      background: var(--forest);
+    }
+
+    /* Detail panel */
+    #detail-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-top: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    #detail-panel.open {
+      display: block;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    #close-detail {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: .8rem;
+      cursor: pointer;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    #close-detail:hover {
+      background: var(--beige);
+    }
+
+    .detail-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+      margin-top: 10px;
+    }
+
+    .detail-body th {
+      text-align: left;
+      font-size: .75rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 10px;
+    }
+
+    .detail-body td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #f1f3f8;
+      vertical-align: middle;
+    }
+
+    .detail-body tr:last-child td {
+      border-bottom: none;
+    }
+
+
+
+
+
+    /* AI narrative */
+    .ai-narrative {
+      background: var(--beige);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 26px;
+      font-size: .88rem;
+      line-height: 1.85;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--accent);
+    }
+
+    /* Traffic light */
+    .tl-wrap {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .tl-light {
+      background: #1c1c1c;
+      border-radius: 14px;
+      padding: 10px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .tl-bulb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      opacity: .12;
+      transition: opacity .2s;
+    }
+
+    .tl-bulb.red {
+      background: #ef4444;
+    }
+
+    .tl-bulb.orange {
+      background: #f97316;
+    }
+
+    .tl-bulb.green {
+      background: #22c55e;
+    }
+
+    .tl-bulb.active.red {
+      opacity: 1;
+      box-shadow: 0 0 12px #ef4444;
+    }
+
+    .tl-bulb.active.orange {
+      opacity: 1;
+      box-shadow: 0 0 12px #f97316;
+    }
+
+    .tl-bulb.active.green {
+      opacity: 1;
+      box-shadow: 0 0 12px #22c55e;
+    }
+
+    .tl-text {}
+
+    .tl-status {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .tl-status.red {
+      color: #dc2626;
+    }
+
+    .tl-status.orange {
+      color: #d97706;
+    }
+
+    .tl-status.green {
+      color: #16a34a;
+    }
+
+    .tl-reason {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Print bar */
+    .print-bar {
+      background: var(--beige);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 32px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .print-btn {
+      font-size: .78rem;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(64, 25, 56, .2);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .print-btn:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .print-btn.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .print-btn.primary:hover {
+      background: #5c2550;
+    }
+
+    /* Version picker */
+    .version-picker {
+      display: flex;
+      gap: 4px;
+    }
+
+    .ver-btn {
+      font-size: .75rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, .3);
+      background: rgba(255, 255, 255, .12);
+      color: rgba(255, 255, 255, .8);
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .ver-btn:hover {
+      background: rgba(255, 255, 255, .22);
+      color: #fff;
+      border-color: rgba(255, 255, 255, .6);
+    }
+
+    .ver-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+
+    /* Print page styles (injected into new window) */
+    @media print {
+
+      .print-bar,
+      .tab-bar,
+      #source-modal-overlay {
+        display: none !important;
+      }
+    }
+
+    /* Overview timeline */
+    .timeline-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+      margin-top: 16px;
+    }
+
+    .timeline-table th {
+      text-align: left;
+      font-size: .72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      border-bottom: 2px solid var(--border);
+      padding: 8px 12px;
+    }
+
+    .timeline-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f3f8;
+    }
+
+    .timeline-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .timeline-table tr.sprint-done td {
+      background: #edf5f4;
+    }
+
+    .timeline-table tr.sprint-active td {
+      background: var(--accent-light);
+    }
+
+    .sprint-label {
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .sprint-label.done {
+      color: var(--forest);
+    }
+
+    .sprint-label.active {
+      color: var(--accent);
+    }
+
+    .sprint-label.planned {
+      color: var(--muted);
+    }
+
+    .sub-label {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: 6px;
+      margin-bottom: 20px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media(max-width: 640px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 {
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    /* Row source button */
+    .row-src-btn { 
+      font-size: .65rem; 
+      font-weight: 600; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      background: var(--beige); 
+      border: 1px solid var(--border); 
+      color: var(--muted); 
+      cursor: pointer; white-space:
+      nowrap; 
+    }
+
+    .row-src-btn:hover { 
+      background: var(--accent-light); 
+      color: var(--accent); 
+      border-color: var(--accent); 
+    }
+
+    /* Section source badges */
+    .source-badge { 
+      display: inline-block; 
+      font-size: .7rem; 
+      font-weight: 600; 
+      padding: 2px 8px; 
+      border-radius: 20px; 
+      background: var(--beige); 
+      border: 1px solid var(--border); 
+      color: var(--muted); 
+      cursor: pointer; 
+      margin: 2px; 
+      transition: background .12s; 
+    }
+
+    .source-badge:hover { 
+      background: var(--accent-light); 
+      color: var(--accent); 
+      border-color: var(--accent); 
+    }
+
+    .sources-label { 
+      font-size: .75rem; 
+      color: var(--muted); 
+      margin-top: 14px; 
+      margin-bottom: 4px; 
+    }
+
+    /* Source modal */
+    #source-modal-overlay { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,.35); 
+      z-index: 100; 
+      align-items: center; 
+      justify-content: center; 
+    }
+
+    #source-modal-overlay.open  { 
+      display: flex; 
+    }
+
+    #source-modal { 
+      background: var(--surface); 
+      border-radius: var(--radius); 
+      padding: 28px 32px; 
+      max-width: 520px; 
+      width: 90%; 
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    }
+
+    #source-modal h3 { 
+      margin-bottom: 6px; 
+    }
+
+    #source-modal .source-meta {
+      font-size: .78rem; 
+      color: var(--muted); 
+      margin-bottom: 14px; 
+      line-height: 1.8; 
+    }
+    #source-modal .source-row { 
+      padding: 8px 0; 
+      border-bottom: 1px solid var(--border); 
+      font-size: .85rem; 
+    }
+
+    #source-modal .source-row:last-child { 
+      border-bottom: none; 
+    }
+    #source-modal .source-row strong { 
+      display: block; 
+      font-weight: 600; 
+      font-size: .73rem; 
+      color: var(--muted); 
+      text-transform: uppercase; 
+      letter-spacing: .04em; 
+    }
+
+    #close-source { 
+      margin-top: 18px; 
+      background: var(--primary); 
+      color: #fff; border: none; 
+      border-radius: 6px; 
+      padding: 8px 20px; 
+      font-size: .85rem; 
+      font-weight: 700; 
+      cursor: pointer; 
+      font-family: 'Nunito', sans-serif; 
+    }
+    #close-source:hover { background: #5c2550; }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <h1 id="project-title"></h1>
+      <div class="header-meta">Report generated: <span id="report-date"></span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-left:auto;flex-wrap:wrap;">
+      <span class="recap-wordmark">RECAP</span>
+      <div class="version-picker" id="version-picker">
+        <button class="ver-btn active" data-ver="v_generated" data-i18n-ver="ver_generated">Latest Report</button>
+      </div>
+      <span class="sprint-badge" id="sprint-badge"></span>
+    </div>
+  </header>
+
+  <div class="print-bar">
+    <button class="print-btn" id="btn-print-tab">Download this tab</button>
+    <button class="print-btn primary" id="btn-print-all">Download full report</button>
+  </div>
+
+  <nav class="tab-bar" id="tab-bar">
+    <button class="tab-btn active" data-tab="overview" data-i18n="tab_overview">Overview</button>
+    <button class="tab-btn" data-tab="time" data-i18n="tab_time">Time &amp; Cost</button>
+    <button class="tab-btn" data-tab="features" data-i18n="tab_features">Feature Progress</button>
+    <button class="tab-btn" data-tab="dataquality" data-i18n="tab_dataquality">Data Quality</button>
+    <button class="tab-btn" data-tab="risks" data-i18n="tab_risks">Risks &amp; Alerts</button>
+    <button class="tab-btn" data-tab="quality" data-i18n="tab_quality">Quality</button>
+    <button class="tab-btn" data-tab="ai" data-i18n="tab_ai">AI Insights</button>
+  </nav>
+
+  <main id="main-content"></main>
+
+  <div style="max-width:1100px;margin:0 auto;padding:0 32px 48px;">
+    <div id="detail-panel">
+      <div class="detail-header">
+        <h2 id="detail-title"></h2>
+        <button id="close-detail">✕ Close</button>
+      </div>
+      <div class="detail-body" id="detail-body"></div>
+    </div>
+  </div>
+
+  <div id="source-modal-overlay">                                                                                                                                                                                
+    <div id="source-modal">                                                                                                                                                                                      
+      <h3 id="source-modal-title"></h3>                                                                                                                                                                          
+      <div class="source-meta" id="source-modal-meta"></div>                                                                                                                                                     
+      <div id="source-modal-body"></div>                                                                                                                                                                         
+      <button id="close-source">Close</button>                                                                                                                                                                   
+    </div>                                                                                                                                                                                                       
+  </div>             
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ═══════════════════════════════════════════════
+         PROJECT CONSTANTS
+      ═══════════════════════════════════════════════ */
+      /* ═══════════════════════════════════════════════
+         TRANSLATIONS
+      ═══════════════════════════════════════════════ */
+      const T = {
+        en: {
+          tab_overview: 'Overview', tab_time: 'Time & Cost', tab_features: 'Feature Progress',
+          tab_dataquality: 'Data Quality', tab_risks: 'Risks & Alerts', tab_quality: 'Quality', tab_ai: 'AI Insights',
+          ver_v1: 'After Sprint 1', ver_v2: 'After Sprint 2', ver_v3: 'Sprint 3 in progress',
+          btn_print_tab: 'Download this tab', btn_print_all: 'Download full report',
+          btn_close: 'Close', btn_close_detail: '✕ Close', card_hint: 'Click for details →',
+          sources_label: 'Data sources — click to view provenance:',
+          overview_weighted: 'Weighted progress (story points)',
+          overview_note: 'All figures in this overview are sourced from the project management tools. To see the data behind any number — including which tool it came from and how reliable it is — navigate to the relevant tab and click into a card.',
+          intro_overview_h: 'Project Overview',
+          intro_overview_p: 'Combined view of progress, budget, and sprint timeline. Weighted progress differs from feature count because story points reflect feature size — larger features count for more.',
+          intro_time_h: 'Time & Cost',
+          intro_time_p: 'Hour-based view: billable vs actual hours, estimation accuracy, and budget consumption. Primary audience: <strong>Project Manager, Finance</strong>.',
+          intro_features_h: 'Feature Progress',
+          intro_features_p: 'Features delivered vs planned scope, plus actual hours logged against the original estimate. Primary audience: <strong>Customer, Product Owner</strong>.',
+          intro_dataquality_h: 'Data Quality',
+          intro_dataquality_p: 'How reliably are project tools being maintained? Poor data quality limits the accuracy of this report. Each metric indicates how much the system can trust the underlying data. Primary audience: <strong>Project Manager, Team Lead</strong>.',
+          intro_risks_h: 'Risks & Alerts',
+          intro_risks_p: 'Scope changes, documentation gaps, velocity risks, and external dependencies. Primary audience: <strong>Project Manager, Customer</strong>.',
+          intro_quality_h: 'Quality',
+          intro_quality_p: 'Bug tracking, test coverage, and code review compliance. Primary audience: <strong>Tech Lead, QA</strong>.',
+          intro_ai_h: 'AI Insights',
+          intro_ai_p: 'AI-generated narrative summary with full data traceability. Every conclusion links to its source. Primary audience: <strong>All stakeholders</strong>.',
+          budget_panel_h: 'Budget', budget_panel_p: 'On track. Deviation of +12 kSEK (SR-41) is within tolerance but should be discussed with customer.',
+          schedule_panel_h: 'Schedule', schedule_panel_p: 'Sprint 3 starts today. Velocity risk exists — 8 items in sprint vs historical avg of 3.5 completed/sprint.',
+          sprint_timeline_h: 'Sprint Timeline',
+          sprint_timeline_note: '* Sprint 3 includes 3 carry-overs from Sprint 2',
+          // KPI labels
+          'Budget consumed': 'Budget consumed', 'Features complete': 'Features complete', 'Story points done': 'Story points done',
+          'Open risks': 'Open risks', 'Open bugs': 'Open bugs', 'Data completeness': 'Data completeness',
+          'Billable hours (total)': 'Billable hours (total)', 'Non-billable hours': 'Non-billable hours', 'Budget remaining': 'Budget remaining',
+          'Features planned': 'Features planned', 'In progress': 'In progress', 'Tickets up to date': 'Tickets up to date',
+          'Missing required fields': 'Missing required fields', 'Unassigned tickets': 'Unassigned tickets',
+          'Meeting hrs for status': 'Meeting hrs for status', 'Scope creep signals': 'Scope creep signals',
+          'Missing docs': 'Missing docs', 'Budget deviation': 'Budget deviation', 'Test coverage': 'Test coverage',
+          'Tests passing': 'Tests passing', 'Code review rate': 'Code review rate', 'Overall status': 'Overall status',
+          'Budget forecast': 'Budget forecast', 'Delivery forecast': 'Delivery forecast',
+        }
+      };
+
+      function t(key) { return (T.en[key] || key); }
+
+      /* Extract a numeric value from a KPI entry (handles "X", "X / Y", "X%", "Xh") */
+      function extractNum(kpi) {
+        if (!kpi) return null;
+        const m = String(kpi.value).match(/[\d.]+/);
+        return m ? parseFloat(m[0]) : null;
+      }
+
+      /* Find a KPI by fuzzy label match */
+      function findKpi(kpis, ...terms) {
+        return kpis.find(x => terms.some(t => x.label.toLowerCase().includes(t.toLowerCase())));
+      }
+
+      /* Build features-done/planned progress object */
+      function featPct(kpis) {
+        // Try explicit "done / planned" style single KPI first
+        const spK = findKpi(kpis, 'story point', 'story pts', 'sp done', 'points done');
+        if (spK && String(spK.value).includes('/')) {
+          const parts = spK.value.split('/').map(s => parseInt(s.trim()));
+          if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parts[1] > 0)
+            return { pct: Math.round(parts[0] / parts[1] * 100), done: parts[0], total: parts[1] };
+        }
+        // Features complete + planned pair
+        const kDone = findKpi(kpis, 'features complete', 'feat complete', 'done', 'implemented', 'delivered');
+        const kPlan = findKpi(kpis, 'features planned', 'feat planned', 'total features', 'planned');
+        if (kDone && kPlan) {
+          const done = extractNum(kDone), total = extractNum(kPlan);
+          if (done !== null && total !== null && total > 0)
+            return { pct: Math.round(done / total * 100), done, total };
+        }
+        // Single percentage KPI
+        const pctK = findKpi(kpis, 'feature progress', 'completion', 'progress');
+        if (pctK) { const p = extractNum(pctK); if (p !== null) return { pct: Math.min(100, p), done: p, total: 100 }; }
+        return null;
+      }
+
+      /* Build actual-vs-estimated hours progress object */
+      function hoursPct(kpis) {
+        const kActual = findKpi(kpis, 'actual hours', 'hours logged', 'hours spent', 'logged hours', 'time logged');
+        const kEst    = findKpi(kpis, 'estimated hours', 'hours estimated', 'budget hours', 'planned hours');
+        if (kActual && kEst) {
+          const actual = extractNum(kActual), est = extractNum(kEst);
+          if (actual !== null && est !== null && est > 0)
+            return { pct: Math.min(100, Math.round(actual / est * 100)), actual, estimated: est };
+        }
+        return null;
+      }
+
+      /* Legacy alias used elsewhere in the template */
+      function spPct(kpis) {
+        const f = featPct(kpis);
+        if (f) return { pct: f.pct, done: f.done, total: f.total, metric: 'feat' };
+        return { pct: 0, done: 0, total: 0, metric: 'none' };
+      }
+
+      /* ═══════════════════════════════════════════════
+         DATA
+      ═══════════════════════════════════════════════ */
+      const VERSIONS = {
+
+        sources: {
+          'jira-hours': {
+            name: 'Jira — Time Tracking',
+            tool: 'Jira Software (Atlassian)',
+            location: 'Project: COOPERON → Reports → Time tracking',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Logged hours per ticket and per role' },
+              { field: 'Coverage', value: 'Sprint 1 (7–18 Apr) and Sprint 2 (19–26 Apr 2026)' },
+              { field: 'Reliability', value: 'High — cross-validated with Tempo. 5 closed tickets have no hours (see Data Quality).' },
+            ]
+          },
+          'jira-board': {
+            name: 'Jira — Sprint Board & Backlog',
+            tool: 'Jira Software (Atlassian)',
+            location: 'Project: COOPERON → Active Sprint / Backlog',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Ticket status, descriptions, acceptance criteria, sprint assignments' },
+              { field: 'Coverage', value: 'All sprints (historical and planned backlog)' },
+              { field: 'Reliability', value: 'Medium — not all tickets are consistently updated. 4 tickets missing required fields.' },
+            ]
+          },
+          'jira-bugs': {
+            name: 'Jira — Bug Reports',
+            tool: 'Jira Software (Atlassian)',
+            location: 'Project: COOPERON → Issues → Type: Bug',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Bug ID, title, priority, sprint introduced' },
+              { field: 'Coverage', value: 'Sprint 1–2' },
+              { field: 'Reliability', value: 'Medium-high — bugs are filed consistently but not always linked to root cause tickets.' },
+            ]
+          },
+          'tempo-s1': {
+            name: 'Tempo Timesheets — Sprint 1',
+            tool: 'Tempo (Jira plugin)',
+            location: 'Tempo → Reports → Sprint 1 export (7–18 Apr 2026)',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Billable vs non-billable hours by category' },
+              { field: 'Coverage', value: 'Sprint 1 (7–18 Apr 2026)' },
+              { field: 'Reliability', value: 'High — cross-validated against Jira time logs.' },
+            ]
+          },
+          'tempo-s2': {
+            name: 'Tempo Timesheets — Sprint 2',
+            tool: 'Tempo (Jira plugin)',
+            location: 'Tempo → Reports → Sprint 2 export (19–26 Apr 2026)',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Billable vs non-billable hours by category' },
+              { field: 'Coverage', value: 'Sprint 2 (19–26 Apr 2026)' },
+              { field: 'Reliability', value: 'High — SR-41 hours are categorised as billable pending customer discussion.' },
+            ]
+          },
+          'confluence-s1': {
+            name: 'Confluence — Sprint 1 Review Notes',
+            tool: 'Confluence (Atlassian)',
+            location: 'Cooperon AB Space → Sprint Reviews → Sprint 1',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Sprint goal, accepted features, customer feedback, retrospective notes' },
+              { field: 'Coverage', value: 'Sprint 1' },
+              { field: 'Reliability', value: 'High — maintained by PM and reviewed by team.' },
+            ]
+          },
+          'confluence-s2': {
+            name: 'Confluence — Sprint 2 Review Notes',
+            tool: 'Confluence (Atlassian)',
+            location: 'Cooperon AB Space → Sprint Reviews → Sprint 2',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Sprint goal, accepted features, carry-overs, blockers, retrospective' },
+              { field: 'Coverage', value: 'Sprint 2' },
+              { field: 'Reliability', value: 'Medium — SR-41 note was added retroactively after the review meeting.' },
+            ]
+          },
+          'confluence-backlog': {
+            name: 'Confluence — Product Backlog',
+            tool: 'Confluence (Atlassian)',
+            location: 'Cooperon AB Space → Planning → Product Backlog',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Feature names, sprint assignments, story points, priorities' },
+              { field: 'Coverage', value: 'Sprints 3–6 (planned)' },
+              { field: 'Reliability', value: 'Medium — not yet refined for Sprints 5–6. Accuracy decreases for later sprints.' },
+            ]
+          },
+          'github-prs': {
+            name: 'GitHub — Pull Requests',
+            tool: 'GitHub',
+            location: 'github.com/cooperon/integration-platform → Pull requests (merged)',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'PR count, reviewer status, merge timestamps, linked tickets' },
+              { field: 'Coverage', value: 'Sprint 1–2' },
+              { field: 'Reliability', value: 'High — GitHub audit log is authoritative.' },
+            ]
+          },
+          'github-actions': {
+            name: 'GitHub Actions — CI Results',
+            tool: 'GitHub Actions',
+            location: 'github.com/cooperon/integration-platform → Actions → main branch',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Test pass/fail counts, run timestamps' },
+              { field: 'Coverage', value: 'All commits to main, Sprint 1–2' },
+              { field: 'Reliability', value: 'High — automated; not subject to manual entry.' },
+            ]
+          },
+          'jacoco-report': {
+            name: 'JaCoCo — Test Coverage Report',
+            tool: 'JaCoCo (Java Code Coverage)',
+            location: 'CI artefact: integration-platform/coverage/index.html — Sprint 2 final run',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Line and branch coverage % per module' },
+              { field: 'Coverage', value: 'Sprint 2 final commit (26 Apr 2026)' },
+              { field: 'Reliability', value: 'High — generated automatically in CI pipeline.' },
+            ]
+          },
+          'email-sr41': {
+            name: 'Email — SR-41 Internal Decision Thread',
+            tool: 'Microsoft Outlook / Teams',
+            location: 'Internal thread: "Auth Layer — security improvement" (20 Apr 2026)',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Decision record, participants, date of decision' },
+              { field: 'Coverage', value: '20 Apr 2026 (Sprint 2, day 2)' },
+              { field: 'Reliability', value: 'High as a record of internal decision.' },
+              { field: 'Key finding', value: 'SR-41 was decided and implemented without a customer-facing change request. No customer correspondence found in the thread.' },
+            ]
+          },
+          'email-apikey': {
+            name: 'Email — API Credentials Request',
+            tool: 'Microsoft Outlook',
+            location: 'Email thread: "Cooperon AB API credentials" (7 Apr 2026)',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Request date, customer response date, blocker duration' },
+              { field: 'Coverage', value: 'Sprint 1 (7–11 Apr 2026)' },
+              { field: 'Reliability', value: 'High — email timestamps are authoritative.' },
+              { field: 'Key finding', value: 'Credentials requested day 1, received day 5. ~4 h of capacity lost. Customer not informed of the impact.' },
+            ]
+          },
+          'email-acceptance': {
+            name: 'Email — Sprint 1 Customer Acceptance',
+            tool: 'Microsoft Outlook',
+            location: 'Email thread: "Cooperon AB Sprint 1 — sign-off" (19 Apr 2026)',
+            accessed: '27 Apr 2026',
+            rows: [
+              { field: 'Data type', value: 'Customer written acceptance for F-02 (database schema v1)' },
+              { field: 'Coverage', value: 'Sprint 1' },
+              { field: 'Reliability', value: 'High — written confirmation from Cooperon AB contact.' },
+              { field: 'Note', value: 'Only F-02 has written acceptance. F-01 and F-03 are verbal (recorded in Confluence). F-04 has no acceptance record.' },
+            ]
+          },
+        }
+        , v_generated: {
+  "meta": {
+    "projectName": "Cooperon AB",
+    "reportDate": "27 May 2026, 02:54",
+    "sprintBadge": "Generated Report",
+    "trafficLight": [
+      "green",
+      "Delivery remains on track, but release readiness now depends on performance stabilization and reporting alignment",
+      "36 of 42 tickets are complete and 86% of budget has been used in line with progress; the key management focus is closing COOP-37/COOP-35 and their dependent UAT and sign-off steps."
+    ],
+    "trafficLight_sv": [
+      "grön",
+      "Leveransen är i fas, men driftsättning beror nu på prestandastabilisering och bättre rapporteringssynk",
+      "36 av 42 ärenden är klara och 86 % av budgeten är förbrukad i linje med progressen; ledningens fokus bör vara att stänga COOP-37/COOP-35 samt deras beroenden mot UAT och sign-off."
+    ]
+  },
+  "overview": {
+    "kpis": [
+      {
+        "label": "Budget consumed",
+        "value": "86 %",
+        "status": "ok",
+        "sub": "509h of 590h est."
+      },
+      {
+        "label": "Tickets done",
+        "value": "36 / 42",
+        "status": "ok",
+        "sub": "86 % complete"
+      },
+      {
+        "label": "Open risks",
+        "value": "5",
+        "status": "warn",
+        "sub": "1 high, 4 medium"
+      },
+      {
+        "label": "Open bugs",
+        "value": "2",
+        "status": "warn",
+        "sub": "1 high priority"
+      },
+      {
+        "label": "Data completeness",
+        "value": "82 %",
+        "status": "warn",
+        "sub": "2 status, 1 docs gap"
+      }
+    ],
+    "cards": [
+      {
+        "id": "insight-1",
+        "title": "Performance stabilization is the only material release gate",
+        "badge": "danger",
+        "badgeText": "High Impact",
+        "date": "2026-05-26",
+        "summary": "The remaining delivery risk is concentrated in COOP-37 and COOP-35: load spikes and residual memory creep must be resolved before COOP-40 UAT review can complete.",
+        "detail": {
+          "intro": "Assign senior performance support immediately and run a short, time-boxed readiness sprint focused on load metrics, leak validation, and explicit exit criteria for UAT.",
+          "table": {
+            "headers": [
+              "Detail"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-40 is blocked pending load-test metrics from COOP-37."
+                ],
+                "source": "COOP-40"
+              },
+              {
+                "cells": [
+                  "COOP-37 still reports staging response spikes under concurrent DB load, against the <200ms acceptance target."
+                ],
+                "source": "COOP-37"
+              },
+              {
+                "cells": [
+                  "COOP-35 has implementation committed, but Jira comments still report slight memory creep after the latest fix attempt."
+                ],
+                "source": "COOP-35"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "insight-2",
+        "title": "External dependencies have replaced capacity as the schedule risk",
+        "badge": "warn",
+        "badgeText": "Medium Impact",
+        "date": "2026-05-26",
+        "summary": "The project has enough budget and delivery momentum, but COOP-39 customer sign-off and COOP-36 cross-team payload alignment can delay closure of the final scope.",
+        "detail": {
+          "intro": "Treat these as leadership escalations rather than engineering shortfalls: secure customer approval, lock interface decisions, and protect the team from further context switching.",
+          "table": {
+            "headers": [
+              "Detail"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-39 cannot proceed with legacy FTP decommissioning until customer sign-off is received."
+                ],
+                "source": "COOP-39"
+              },
+              {
+                "cells": [
+                  "COOP-36 remains open because payload layouts still need cross-team alignment."
+                ],
+                "source": "COOP-36"
+              },
+              {
+                "cells": [
+                  "Progress and Resource audits show 36/42 tickets done with 81h budget remaining, so the constraint is dependency clearance, not burn rate."
+                ],
+                "source": "COOP-1"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "Tempo",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "insight-3",
+        "title": "Meta-risk alert: project reporting is less mature than the codebase",
+        "badge": "warn",
+        "badgeText": "Medium Impact",
+        "date": "2026-05-26",
+        "summary": "Engineering evidence shows real progress and zero ghost scope, but Jira and Confluence lag is reducing decision quality and creating avoidable governance noise.",
+        "detail": {
+          "intro": "Run a governance cleanup now: update statuses, repair release traceability, and align steering documents to current technical evidence before the next checkpoint.",
+          "table": {
+            "headers": [
+              "Detail"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-35 and COOP-37 both have implementation commits in DevOps while Jira still shows In Progress, indicating status lag rather than absent work."
+                ],
+                "source": "COOP-35"
+              },
+              {
+                "cells": [
+                  "COOP-29 requires release notes to list Sprint 3 tickets, but Confluence does not reference implemented Jira scope."
+                ],
+                "source": "COOP-29"
+              },
+              {
+                "cells": [
+                  "Steering documentation still reports a RED blocker while COOP-22 delivery evidence shows core ERP synchronization work has already been implemented."
+                ],
+                "source": "COOP-22"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps",
+          "Confluence"
+        ]
+      }
+    ],
+    "sprints": []
+  },
+  "time": {
+    "kpis": [
+      {
+        "label": "Billable hours (total)",
+        "value": "509h",
+        "status": "ok",
+        "sub": "Logged in current sprint"
+      },
+      {
+        "label": "Non-billable hours",
+        "value": "0h",
+        "status": "ok",
+        "sub": "0 % overhead"
+      },
+      {
+        "label": "Budget consumed",
+        "value": "86.3 %",
+        "status": "ok",
+        "sub": "509 h of 590 h"
+      },
+      {
+        "label": "Budget remaining",
+        "value": "81h",
+        "status": "ok",
+        "sub": "On track"
+      }
+    ],
+    "cards": [
+      {
+        "id": "backlog-accumulation",
+        "title": "Backlog and Blockers",
+        "badge": "warn",
+        "badgeText": "At Risk",
+        "date": "2026-05-26",
+        "summary": "3 To Do and 3 In Progress tickets represent ~48h remaining estimates amid external dependencies.",
+        "detail": {
+          "intro": "Expedite customer sign-offs and internal handoffs to prevent sprint slippage.",
+          "table": {
+            "headers": [
+              "Area",
+              "Detail"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Decommission",
+                  "Pending customer sign-off (COOP-39)"
+                ],
+                "source": "COOP-39"
+              },
+              {
+                "cells": [
+                  "UAT Review",
+                  "Awaiting load test metrics (COOP-40)"
+                ],
+                "source": "COOP-40"
+              },
+              {
+                "cells": [
+                  "Load Testing",
+                  "Connection pool tuning ongoing (COOP-37)"
+                ],
+                "source": "COOP-37"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira"
+        ]
+      },
+      {
+        "id": "perf-tuning-gaps",
+        "title": "Performance Optimization Needs",
+        "badge": "warn",
+        "badgeText": "Skill Gap",
+        "date": "2026-05-26",
+        "summary": "Persistent issues in memory and load testing signal potential expertise shortfall.",
+        "detail": {
+          "intro": "Provide targeted training or pair with senior perf engineer; validate with stress tests.",
+          "table": {
+            "headers": [
+              "Component",
+              "Detail"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Logger Middleware",
+                  "Ongoing memory creep post-flush (COOP-35)"
+                ],
+                "source": "COOP-35"
+              },
+              {
+                "cells": [
+                  "Support Portal",
+                  "Coordination needed for API payloads (COOP-36)"
+                ],
+                "source": "COOP-36"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira"
+        ]
+      },
+      {
+        "id": "delivery-health",
+        "title": "Strong Completion Rate",
+        "badge": "ok",
+        "badgeText": "Optimal",
+        "date": "2026-05-26",
+        "summary": "High volume of Done tickets (e.g., COOP-22 at 30h logged) matches billable burn.",
+        "detail": {
+          "intro": "Maintain velocity; monitor for fatigue as dates span months without overhead.",
+          "table": {
+            "headers": [
+              "Epic Area",
+              "Detail"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Queue/ERP Sync",
+                  "Completed heavy lift (COOP-22)"
+                ],
+                "source": "COOP-22"
+              },
+              {
+                "cells": [
+                  "DevOps Pipeline",
+                  "Multiple infra tasks closed (COOP-31,32)"
+                ],
+                "source": "COOP-31"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "Tempo"
+        ]
+      }
+    ]
+  },
+  "features": {
+    "kpis": [
+      {
+        "label": "Features complete",
+        "value": "36",
+        "status": "ok",
+        "sub": "36/42 tickets Done (86% completion)"
+      },
+      {
+        "label": "Features planned",
+        "value": "42",
+        "status": "ok",
+        "sub": "Total scope across project"
+      },
+      {
+        "label": "Actual hours",
+        "value": "509h",
+        "status": "ok",
+        "sub": "86% of budget consumed per budgetBaseline"
+      },
+      {
+        "label": "Estimated hours",
+        "value": "590h",
+        "status": "warn",
+        "sub": "81h remaining; est. for open tickets ~50h"
+      }
+    ],
+    "cards": [
+      {
+        "id": "milestone-health",
+        "title": "Milestone Health",
+        "badge": "ok",
+        "badgeText": "On Track",
+        "date": "2026-05-26",
+        "summary": "Strong progress with 36/42 features complete and commits correlating to Done/In Progress tickets. Burn rate supports completion within budget.",
+        "detail": {
+          "intro": "86% budget consumed (509/590h). Recent commits (e.g., 56a1cad7 for COOP-36) verify technical velocity matches Jira. Forecast: Achievable with current throughput.",
+          "table": {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Done Tickets",
+                  "36"
+                ],
+                "source": "Jira (COOP-2 to COOP-42 excl. open)"
+              },
+              {
+                "cells": [
+                  "Commits (Last 30d)",
+                  "29"
+                ],
+                "source": "DevOps (e3cd0d5d repo)"
+              },
+              {
+                "cells": [
+                  "Budget Used",
+                  "86%"
+                ],
+                "source": "budgetBaseline"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "blockers",
+        "title": "Critical Path Blockers",
+        "badge": "warn",
+        "badgeText": "At Risk",
+        "date": "2026-05-26",
+        "summary": "3 In Progress tickets with activity but stalled comments; 3 To Do blocked by external deps. No zombies (>3d no commits), but UAT gating production.",
+        "detail": {
+          "intro": "COOP-40 blocks release (awaits load tests from COOP-37). COOP-39 awaits customer sign-off. In Progress have commits (e.g., cae4a3a5f for COOP-35) but ongoing issues noted.",
+          "table": {
+            "headers": [
+              "Ticket",
+              "Status/Days Stalled"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-40",
+                  "To Do - Awaiting load metrics (COOP-37)"
+                ],
+                "source": "COOP-40"
+              },
+              {
+                "cells": [
+                  "COOP-39",
+                  "To Do - Pending customer sign-off"
+                ],
+                "source": "COOP-39"
+              },
+              {
+                "cells": [
+                  "COOP-37",
+                  "In Progress - Tuning DB pool (logged 6/16h)"
+                ],
+                "source": "COOP-37 (21305159 commit)"
+              },
+              {
+                "cells": [
+                  "COOP-36",
+                  "In Progress - Coord payload w/ COOP-37 (logged 12/20h)"
+                ],
+                "source": "COOP-36 (56a1cad7 commit)"
+              },
+              {
+                "cells": [
+                  "COOP-35",
+                  "In Progress - Mem creep persists (logged 8/14h)"
+                ],
+                "source": "COOP-35 (cae4a3a5f commit)"
+              },
+              {
+                "cells": [
+                  "COOP-1",
+                  "To Do - Epic nearly complete (38/40h logged)"
+                ],
+                "source": "COOP-1"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      }
+    ]
+  },
+  "dataquality": {
+    "kpis": [
+      {
+        "label": "Consistency Score",
+        "value": "82%",
+        "status": "warn",
+        "sub": "Several documentation and status alignment gaps detected across Jira, DevOps, and Confluence."
+      },
+      {
+        "label": "Ghost Scope Detection",
+        "value": "0",
+        "status": "ok",
+        "sub": "39/39 commits contain Jira keys: COOP-36, COOP-33, COOP-34, COOP-32, COOP-37, COOP-38, COOP-35, COOP-30, COOP-31, COOP-22, COOP-27, COOP-28, COOP-29, COOP-23, COOP-26, COOP-25, COOP-24, COOP-12, COOP-15, COOP-17, COOP-19, COOP-20, COOP-21, COOP-14, COOP-13, COOP-16, COOP-18, COOP-42, COOP-9, COOP-4, COOP-7, COOP-41, COOP-3, COOP-11, COOP-6, COOP-5, COOP-2, COOP-8, COOP-10."
+      },
+      {
+        "label": "Status Distortion Cases",
+        "value": "2",
+        "status": "warn",
+        "sub": "Commits indicate implementation while Jira items remain In Progress."
+      },
+      {
+        "label": "Traceability Gaps",
+        "value": "1",
+        "status": "warn",
+        "sub": "Confluence release documentation does not reference implemented Jira scope."
+      }
+    ],
+    "cards": [
+      {
+        "id": "status-distortion-coop-37",
+        "title": "Administrative-Technical Gap",
+        "badge": "warn",
+        "badgeText": "Medium",
+        "date": "2026-05-13",
+        "summary": "A DevOps commit indicates implementation work for load/stress testing while the Jira ticket still reports the task as 'In Progress', suggesting incomplete status synchronization between development execution and project tracking.",
+        "detail": {
+          "intro": "Confirm whether the testing scripts were finalized or only partially implemented. If completed, update Jira status or add follow-up subtasks describing remaining tuning work.",
+          "table": {
+            "headers": [
+              "Source A",
+              "Source B"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Commit 21305159bfc37b21e29652a19de01c3da334074a – \"[COOP-37] Implement integration changes for Perform load and stress testing on staging gateway\"",
+                  "Jira COOP-37 – Status: In Progress"
+                ],
+                "source": "COOP-37"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "status-distortion-coop-35",
+        "title": "Administrative-Technical Gap",
+        "badge": "warn",
+        "badgeText": "Medium",
+        "date": "2026-05-13",
+        "summary": "Code changes addressing the Winston logger memory leak have already been committed in DevOps, yet the Jira issue remains 'In Progress'. This may reflect partial implementation or missing status updates.",
+        "detail": {
+          "intro": "Verify if the commit fully resolves the memory leak or if further fixes are required. Update Jira workflow or create additional tasks for remaining debugging steps.",
+          "table": {
+            "headers": [
+              "Source A",
+              "Source B"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Commit cae4a3a5f590e1e51ebd4fe87d64b31ff23102fb – \"[COOP-35] Implement integration changes for Fix memory leakage in Winston logger middleware\"",
+                  "Jira COOP-35 – Status: In Progress"
+                ],
+                "source": "COOP-35"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "traceability-release-docs",
+        "title": "Traceability Breach",
+        "badge": "warn",
+        "badgeText": "Documentation Gap",
+        "date": "2026-04-30",
+        "summary": "Jira task COOP-29 specifies that the Sprint 3 release documentation must list all Sprint 3 tickets. The Confluence page 'Release Notes: Sprint 3' does not reference any Jira ticket IDs or deliverables, breaking traceability between planning artifacts and published documentation.",
+        "detail": {
+          "intro": "Update the Sprint 3 Confluence release notes to explicitly reference implemented Jira tickets (e.g., COOP-22, COOP-23, COOP-24, etc.) and link them directly to ensure release traceability.",
+          "table": {
+            "headers": [
+              "Source A",
+              "Source B"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Jira COOP-29 – Acceptance Criteria: \"Document lists all Sprint 3 tickets\"",
+                  "Confluence Page: \"Release Notes: Sprint 3\" – No Jira ticket references present"
+                ],
+                "source": "COOP-29"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "Confluence"
+        ]
+      },
+      {
+        "id": "requirement-drift-memory-leak",
+        "title": "Requirement Drift",
+        "badge": "info",
+        "badgeText": "Potential Documentation Drift",
+        "date": "2026-05-15",
+        "summary": "Confluence release notes repeatedly state that a 'memory leak in the batch processing cron job' is still an open known issue. However, Jira shows at least one memory leak fix completed (COOP-30) and another actively being resolved (COOP-35). The documentation does not reference these remediation tasks, making the issue traceability unclear.",
+        "detail": {
+          "intro": "Clarify whether the known issue refers to a different subsystem or update the Confluence documentation to reference the remediation Jira tickets.",
+          "table": {
+            "headers": [
+              "Source A",
+              "Source B"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Confluence Release Notes – Known Issue: \"Memory leak still present in the batch processing cron job\"",
+                  "Jira COOP-30 (Done) and COOP-35 (In Progress) – Memory leak fixes"
+                ],
+                "source": "COOP-30"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "Confluence"
+        ]
+      },
+      {
+        "id": "governance-status-conflict",
+        "title": "Administrative-Technical Gap",
+        "badge": "danger",
+        "badgeText": "Governance Mismatch",
+        "date": "2026-05-15",
+        "summary": "Steering committee documents repeatedly report a RED project status due to undocumented vendor APIs blocking progress. However, DevOps commits and Jira tasks indicate that core ERP synchronization and retry logic have already been implemented, suggesting the executive reporting status may not reflect actual engineering progress.",
+        "detail": {
+          "intro": "Validate whether vendor API documentation issues still block production readiness or whether the steering committee documentation needs updating to reflect actual technical progress.",
+          "table": {
+            "headers": [
+              "Source A",
+              "Source B"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Confluence: Steering Committee Meeting – Project Health Review states \"RED STATUS: Vendor APIs undocumented and team blocked\"",
+                  "Jira COOP-22 (Done) + Commit 94f5115923ec82f3c11683b65ed1293933b1030a implementing ERP synchronization"
+                ],
+                "source": "COOP-22"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps",
+          "Confluence"
+        ]
+      }
+    ]
+  },
+  "risks": {
+    "kpis": [
+      {
+        "label": "Completion %",
+        "value": "85%",
+        "status": "ok",
+        "sub": "Most tickets Done, 4 open/In Progress"
+      },
+      {
+        "label": "Open Tickets",
+        "value": "4",
+        "status": "warn",
+        "sub": "COOP-35/36/37/39/40 pending"
+      },
+      {
+        "label": "Tech Debt",
+        "value": "3",
+        "status": "warn",
+        "sub": "Recurring memory/load issues"
+      },
+      {
+        "label": "Activity Lag",
+        "value": "11 days",
+        "status": "warn",
+        "sub": "Last commits 2026-05-15 vs Jira 2026-05-26"
+      },
+      {
+        "label": "Volatility Index",
+        "value": "0.14",
+        "status": "ok",
+        "sub": "6 (In Progress/To Do) / 42 total"
+      },
+      {
+        "label": "Churn Rating",
+        "value": "Medium",
+        "status": "warn",
+        "sub": "COOP-35 ongoing after multiple updates"
+      },
+      {
+        "label": "Ghost Scope Detection",
+        "value": "0",
+        "status": "ok",
+        "sub": "All commits traced to tickets"
+      },
+      {
+        "label": "Priority Shuffle Score",
+        "value": "High",
+        "status": "warn",
+        "sub": "Recent commits on fixes/testing vs core"
+      }
+    ],
+    "cards": [
+      {
+        "id": "schedule-uat-risk",
+        "title": "Schedule + UAT Review Delay",
+        "badge": "warn",
+        "badgeText": "2",
+        "date": "2026-05-26",
+        "summary": "Key production readiness ticket stalled awaiting load test metrics.",
+        "detail": {
+          "intro": "Prioritize load testing completion (COOP-37) and escalate steering board review.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Type"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-40: 'Waiting for load test metrics from Jawad.'",
+                  "Jira Comment"
+                ],
+                "source": "COOP-40"
+              },
+              {
+                "cells": [
+                  "COOP-37 status: In Progress, remaining 10h",
+                  "Ticket Status"
+                ],
+                "source": "COOP-37"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira"
+        ]
+      },
+      {
+        "id": "schedule-decom-risk",
+        "title": "Schedule + Legacy Decommission Pending",
+        "badge": "warn",
+        "badgeText": "2",
+        "date": "2026-05-26",
+        "summary": "Decommission ticket blocked on customer sign-off, risking post-go-live cleanup.",
+        "detail": {
+          "intro": "Secure sign-off urgently or defer to post-release maintenance sprint.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Type"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-39: 'Pending customer sign-off to terminate legacy supplier FTP.'",
+                  "Jira Comment"
+                ],
+                "source": "COOP-39"
+              },
+              {
+                "cells": [
+                  "COOP-39 status: To Do, no commits",
+                  "Ticket + DevOps"
+                ],
+                "source": "COOP-39"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira"
+        ]
+      },
+      {
+        "id": "tech-memory-leak",
+        "title": "Technical + Persistent Memory Leak",
+        "badge": "danger",
+        "badgeText": "3",
+        "date": "2026-05-26",
+        "summary": "Winston logger fix incomplete with ongoing creep; prior RabbitMQ leak indicates pattern.",
+        "detail": {
+          "intro": "Deep-dive profiler on request-id metadata; implement GC hooks and monitor in prod.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Type"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-35: 'Added logic to flush... still seeing slight memory creep.'",
+                  "Jira Comment"
+                ],
+                "source": "COOP-35"
+              },
+              {
+                "cells": [
+                  "COOP-35: '[User anonymized] Let's check request-id metadata array.'",
+                  "Jira Comment"
+                ],
+                "source": "COOP-35"
+              },
+              {
+                "cells": [
+                  "cae4a3a5f590e1e51ebd4fe87d64b31ff23102fb (COOP-35 commit)",
+                  "Commit"
+                ],
+                "source": "COOP-35"
+              },
+              {
+                "cells": [
+                  "COOP-30 Done but prior leak fix",
+                  "Prior Ticket"
+                ],
+                "source": "COOP-30"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "tech-load-spikes",
+        "title": "Technical + Load Testing Spikes",
+        "badge": "warn",
+        "badgeText": "3",
+        "date": "2026-05-26",
+        "summary": "Staging gateway response spikes under DB load; violates <200ms AC.",
+        "detail": {
+          "intro": "Tune connection pool and index queries; re-run k6 tests to baseline.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Type"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-37: 'Initial runs show response times spike under concurrent DB queries.'",
+                  "Jira Comment"
+                ],
+                "source": "COOP-37"
+              },
+              {
+                "cells": [
+                  "21305159bfc37b21e29652a19de01c3da334074a (COOP-37 commit)",
+                  "Commit"
+                ],
+                "source": "COOP-37"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "scope-support-portal",
+        "title": "Scope/Mismatch + Portal Coordination Gap",
+        "badge": "warn",
+        "badgeText": "2",
+        "date": "2026-05-26",
+        "summary": "Transaction alerts ticket waiting cross-team payload alignment.",
+        "detail": {
+          "intro": "Schedule sync between frontend/backend devs; clarify AC on payload layouts.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Type"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-36: 'Need to coordinate the payload layouts with [Dev anonymized].'",
+                  "Jira Comment"
+                ],
+                "source": "COOP-36"
+              },
+              {
+                "cells": [
+                  "56a1cad7e586792b33f229309d9dccd1bc72ac6b (COOP-36 commit)",
+                  "Commit"
+                ],
+                "source": "COOP-36"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "priority-shift-firefighting",
+        "title": "Priority Re-shuffling: Shift to Fixes and Testing",
+        "badge": "warn",
+        "badgeText": "Medium Impact",
+        "date": "2026-05-26",
+        "summary": "Recent DevOps commits and In Progress tickets focus on reactive fixes, load tuning, and support tasks (COOP-35,36,37,38) rather than progressing unstarted To Do items like UAT review and decommissioning, indicating resource diversion from baseline plan to stabilization.",
+        "detail": {
+          "intro": "Reactive - Staging issues (memory, load spikes, connectivity) emerged post-core implementation, pulling resources into firefighting.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Impact"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-35 (In Progress: memory leakage fix)",
+                  "Negative"
+                ],
+                "source": "COOP-35"
+              },
+              {
+                "cells": [
+                  "COOP-37 (In Progress: load testing with DB query spikes)",
+                  "Negative"
+                ],
+                "source": "COOP-37"
+              },
+              {
+                "cells": [
+                  "Commit 21305159bfc37b21e29652a19de01c3da334074a (COOP-37)",
+                  "Negative"
+                ],
+                "source": "DevOps"
+              },
+              {
+                "cells": [
+                  "Commit cae4a3a5f590e1e51ebd4fe87d64b31ff23102fb (COOP-35)",
+                  "Negative"
+                ],
+                "source": "DevOps"
+              },
+              {
+                "cells": [
+                  "Commit 8cf8a26e521e0aaab5b831a7df191d2cf9a470f9 (COOP-38: connectivity)",
+                  "Negative"
+                ],
+                "source": "DevOps"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "churn-logger-memory",
+        "title": "Code Churn vs Progress: Winston Logger Fix",
+        "badge": "danger",
+        "badgeText": "High Churn",
+        "date": "2026-05-26",
+        "summary": "COOP-35 repeatedly updated (multiple comments, 8/14 hours logged, still In Progress) without Done status, representing churn on middleware without completion, accumulating technical debt.",
+        "detail": {
+          "intro": "Reactive - Ongoing memory creep despite added logic and suggestions, no resolution in recent updates.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Impact"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-35 comments: flush logic added but 'still seeing slight memory creep'; suggestion to check metadata array",
+                  "Negative"
+                ],
+                "source": "COOP-35"
+              },
+              {
+                "cells": [
+                  "Commit cae4a3a5f590e1e51ebd4fe87d64b31ff23102fb (COOP-35 logger middleware)",
+                  "Negative"
+                ],
+                "source": "DevOps"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira",
+          "DevOps"
+        ]
+      },
+      {
+        "id": "admin-debt-epic-status",
+        "title": "Administrative Debt: Epic Status Lag",
+        "badge": "warn",
+        "badgeText": "Low Impact",
+        "date": "2026-05-26",
+        "summary": "COOP-1 (main epic) has 38/40 hours logged and recent update but remains To Do, misaligning status with effort and delaying milestone recognition.",
+        "detail": {
+          "intro": "Planned epic work nearly complete but status not advanced, impacting timeline reporting.",
+          "table": {
+            "headers": [
+              "Evidence",
+              "Impact"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "COOP-1: estimated 40h, logged 38h, remaining 2h, status To Do",
+                  "Negative"
+                ],
+                "source": "COOP-1"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Jira"
+        ]
+      }
+    ]
+  },
+  "quality": {
+    "kpis": [
+      {
+        "label": "Factual Accuracy",
+        "value": "100%",
+        "status": "ok",
+        "sub": "All claims (e.g., COOP-37/35/40/39/36/29/22) directly traceable to sub-agent cards and source data"
+      },
+      {
+        "label": "Omission Check",
+        "value": "100%",
+        "status": "ok",
+        "sub": "High-sev items covered: memory leak (danger), governance RED mismatch (danger), load spikes (warn)"
+      },
+      {
+        "label": "Tone Alignment",
+        "value": "Green/Warn",
+        "status": "ok",
+        "sub": "Matches sub-agent ok/warn/danger mix; no over-optimism despite RED steering docs"
+      },
+      {
+        "label": "Action Precision",
+        "value": "95%",
+        "status": "ok",
+        "sub": "Concrete (e.g., 'Assign senior perf support', ticket refs); minor vagueness in 'leadership escalations'"
+      }
+    ],
+    "cards": [
+      {
+        "id": "strong-synthesis",
+        "title": "Excellent Cross-Agent Synthesis",
+        "badge": "ok",
+        "badgeText": "Full Fidelity",
+        "date": "2026-05-27",
+        "summary": "Summary accurately aggregates risk/resource/changes/mismatch/progress without decay; e.g., insight-1 mirrors risk 'tech-memory-leak' + 'tech-load-spikes' + 'schedule-uat-risk'.",
+        "detail": {
+          "intro": "No hallucinations; all ticket refs (35/37/40/39/36/29/22) verified in Jira/DevOps/Confluence.",
+          "table": {
+            "headers": [
+              "Summary Claim",
+              "Sub-Agent/Source Match"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "Perf gate: COOP-37/35/40",
+                  "risk cards + Jira comments"
+                ],
+                "source": "risk/mismatch"
+              },
+              {
+                "cells": [
+                  "External deps: COOP-39/36",
+                  "risk + resource cards"
+                ],
+                "source": "risk/resource"
+              },
+              {
+                "cells": [
+                  "Reporting meta-risk: 35/37/29/22",
+                  "mismatch cards (status-distortion, traceability, governance)"
+                ],
+                "source": "mismatch"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Sub-Agent Audits",
+          "Raw Data"
+        ]
+      },
+      {
+        "id": "minor-kpi-nit",
+        "title": "KPI Refinement Opportunity",
+        "badge": "warn",
+        "badgeText": "Low Impact",
+        "date": "2026-05-27",
+        "summary": "'Open bugs: 2' interpretive; sub-agents frame as 'tech debt 3' across COOP-30/35/37. Confluence 'cron job leak' unmatched to tickets.",
+        "detail": {
+          "intro": "Non-blocking; evidence supports but exact phrasing elevates to 'tech debt'.",
+          "table": {
+            "headers": [
+              "Evidence"
+            ],
+            "rows": [
+              {
+                "cells": [
+                  "risk: Tech Debt '3' (memory/load); Confluence: 'batch cron leak'"
+                ],
+                "source": "risk/confluence"
+              }
+            ]
+          }
+        },
+        "sources": [
+          "Sub-Agent Audits"
+        ]
+      }
+    ]
+  },
+  "ai": {
+    "kpis": [
+      {
+        "label": "Overall status",
+        "value": "On Track",
+        "status": "ok",
+        "sub": "Throughput strong; 2 gates remain"
+      },
+      {
+        "label": "Budget forecast",
+        "value": "On Track",
+        "status": "ok",
+        "sub": "Burn matches completion"
+      },
+      {
+        "label": "Delivery forecast",
+        "value": "On Time",
+        "status": "ok",
+        "sub": "Depends on COOP-37/40, COOP-39"
+      }
+    ],
+    "narrative": "Technical reality is stronger than the administrative picture suggests. Delivery throughput is healthy: 36 of 42 tickets are complete, 509 of 590 hours have been consumed, 29 recent commits align to Jira work, and the audits found no ghost scope. This indicates the team is broadly executing to plan and should finish within budget. The remaining exposure is concentrated in production-readiness work rather than core feature build: COOP-37 load testing, COOP-35 memory stabilization, COOP-40 UAT review, and COOP-39 legacy decommission sign-off.<br/><br/>The main executive issue is now alignment, not velocity. Risk, Change, and Integrity findings show that the last-mile work is being obscured by status lag and documentation debt: implementation exists in DevOps while Jira remains In Progress, release notes do not fully trace delivered scope, and steering documentation is more pessimistic than current engineering evidence supports. Meta-risk alert: the Progress and Resource audits indicate an on-track finish, while the Integrity audit flags governance mismatches; this is best interpreted as reporting drift around a real but manageable stabilization phase, not as a failing delivery program.",
+    "narrative_sv": "Den tekniska verkligheten är starkare än den administrativa bilden antyder. Leveranstakten är god: 36 av 42 ärenden är klara, 509 av 590 timmar är använda, 29 nyliga commits kan kopplas till Jira-arbete och granskningen visar ingen ghost scope. Det tyder på att teamet i stort levererar enligt plan och bör kunna avsluta inom budget. Den kvarvarande exponeringen är koncentrerad till produktionsberedskap snarare än ny funktionalitet: COOP-37 lasttest, COOP-35 minnesstabilisering, COOP-40 UAT-granskning och COOP-39 sign-off för avveckling av legacy-lösning.<br/><br/>Den viktigaste ledningsfrågan är nu samordning, inte hastighet. Risk-, Change- och Integrity-granskningarna visar att arbetet i slutskedet delvis döljs av statusfördröjning och dokumentationsskuld: implementation finns i DevOps medan Jira fortfarande visar In Progress, release notes spårar inte fullt ut levererad scope och styrningsdokument är mer pessimistiska än vad den tekniska evidensen motiverar. Meta-risk: Progress- och Resource-granskningarna pekar på en leverans i fas, medan Integrity-granskningen pekar på styrningsavvikelser; detta bör tolkas som rapporteringsdrift runt en verklig men hanterbar stabiliseringsfas, inte som ett havererande projekt.",
+    "sources_used": [
+      "jira-board",
+      "jira-hours",
+      "confluence",
+      "tempo",
+      "devops"
+    ]
+  }
+}
+      }; // end VERSIONS
+
+      // Copy shared sources into the generated version so DATA.sources always resolves
+      if (VERSIONS.v_generated) {
+        VERSIONS.v_generated.sources = VERSIONS.sources;
+      }
+      let DATA = VERSIONS.v_generated || { sources: VERSIONS.sources };
+
+      /* ═══════════════════════════════════════════════
+         HELPERS
+      ═══════════════════════════════════════════════ */
+      function sc(s) { return s === 'ok' ? 'ok' : s === 'warn' ? 'warn' : s === 'danger' ? 'danger' : 'info'; }
+
+      function kpis(list) {
+        return `<div class="kpi-row">${list.map(k => `
+      <div class="kpi-card">
+        <div class="kpi-label">${t(k.label)}</div>
+        <div class="kpi-value ${sc(k.status)}">${k.value}</div>
+        <div class="kpi-sub">${k.sub}</div>
+      </div>`).join('')}</div>`;
+      }
+
+      function progress(pct, status, label) {
+        return `<div class="progress-wrap">
+      <div class="progress-label"><span>${label}</span><span>${pct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill ${sc(status)}" style="width:${pct}%"></div></div>
+    </div>`;
+      }
+
+
+
+      function srcBadge(id) {                                                                                                                                                                                        
+      const s = DATA.sources ? DATA.sources[id] : null;                                                                                                                                                          
+      return `<span class="source-badge" data-source="${id}">${s ? s.tool.split(' ')[0] : id}</span>`;                                                                                                           
+      }                                                                                                                                                                                                              
+                                                                                                                                                                                                                 
+      function sourcesBlock(ids) {                                                                                                                                                                                   
+          if (!ids || !ids.length) return '';                                                                                                                                                                        
+          return `<div class="sources-label">${t('sources_label')}</div><div>${ids.map(srcBadge).join('')}</div>`;                                                                                                   
+      }                                                                                                                                                                                                              
+                                                                                                                                                                                                                 
+      function renderTable(t) {                                                                                                                                                                                      
+          const hasRowSrc = t.rows.some(r => r.cells);                                                                                                                                                               
+          const thead = `<thead><tr>${t.headers.map(h => `<th>${h}</th>`).join('')}${hasRowSrc ? '<th style="width:52px"></th>' : ''}</tr></thead>`;                                                                 
+          const tbody = `<tbody>${t.rows.map(r => {                                                                                                                                                                  
+            const cells = r.cells || r;                                                                                                                                                                              
+            const src = r.source;                                                                                                                                                                                    
+            const srcBtn = hasRowSrc ? `<td>${src ? `<button class="row-src-btn" data-source="${src}">↗ src</button>` : ''}</td>` : '';                                                                              
+            return `<tr>${cells.map(c => `<td>${c}</td>`).join('')}${srcBtn}</tr>`;                                                                                                                                  
+          }).join('')}</tbody>`;                                                                                                                                                                                     
+          return `<table>${thead}${tbody}</table>`;                                                                                                                                                                  
+      }                                             
+
+      function cardHTML(c) {
+        const title = c.title;
+        const summary = c.summary;
+        return `<div class="card" data-card="${c.id}">
+      <div class="card-header">
+        <div class="card-title">${title}</div>
+        <span class="badge ${c.badge}">${c.badgeText}</span>
+      </div>
+      ${c.date ? `<div class="card-date">${c.date}</div>` : ''}
+      <p>${summary}</p>
+      <div class="card-hint">${t('card_hint')}</div>
+    </div>`;
+      }
+
+      let allCards = [];
+      function rebuildAllCards() {
+        allCards = [
+          ...(DATA.overview.cards || []),
+          ...(DATA.time.cards || []),
+          ...(DATA.features.cards || []),
+          ...(DATA.dataquality.cards || []),
+          ...(DATA.risks.cards || []),
+          ...(DATA.quality.cards || []),
+        ];
+      }
+      rebuildAllCards();
+
+      /* ═══════════════════════════════════════════════
+         TAB RENDERERS
+      ═══════════════════════════════════════════════ */
+      const tabs = {
+
+        overview() {
+          const d = DATA.overview;
+          return `
+        <div class="section-intro"><h2>${t('intro_overview_h')}</h2>
+          <p>${t('intro_overview_p')}</p>
+        </div>
+        ${trafficLight(...DATA.meta.trafficLight)}
+        ${kpis(d.kpis || [])}
+
+        <div class="two-col" style="margin-top: 16px;">
+          <div class="panel">
+            <h3 style="font-family:'Nunito',sans-serif;font-size:.9rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px;">Budget Burn Rate</h3>
+            <div style="position:relative;height:200px;"><canvas id="budget-chart"></canvas></div>
+          </div>
+          <div class="panel">
+            <h3 style="font-family:'Nunito',sans-serif;font-size:.9rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px;">Feature Progress</h3>
+            <div style="position:relative;height:200px;"><canvas id="progress-chart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="cards-grid" style="margin-top: 24px;">${(d.cards || []).map(cardHTML).join('')}</div>
+        <p style="margin-top:28px;font-size:.8rem;color:var(--muted);border-top:1px solid var(--border);padding-top:16px;">${t('overview_note')}</p>`;
+        },
+
+        time() {
+          const d = DATA.time;
+          return `<div class="section-intro"><h2>${t('intro_time_h')}</h2>
+        <p>${t('intro_time_p')}</p></div>
+        ${kpis(d.kpis)}
+        <div class="cards-grid">${d.cards.map(cardHTML).join('')}</div>`;
+        },
+
+        features() {
+          const d = DATA.features;
+          const fp = featPct(d.kpis);
+          const hp = hoursPct(d.kpis);
+          const featBar = (() => {
+            if (!fp) return `<p style="color:var(--muted);font-size:.82rem;margin:8px 0 16px;">No feature completion data available.</p>`;
+            const status = fp.pct >= 70 ? 'ok' : fp.pct >= 40 ? 'warn' : 'danger';
+            const label = `Features done — ${fp.done} of ${fp.total} features complete`;
+            return progress(fp.pct, status, label);
+          })();
+          const hoursBar = (() => {
+            if (!hp) return '';
+            const status = hp.pct <= 100 ? 'ok' : 'warn';
+            const label = `Hours logged — ${hp.actual}h of ${hp.estimated}h estimated`;
+            return `<div style="margin-top:10px;">${progress(hp.pct, status, label)}</div>`;
+          })();
+          return `<div class="section-intro"><h2>${t('intro_features_h')}</h2>
+        <p>${t('intro_features_p')}</p></div>
+        ${kpis(d.kpis)}
+        ${featBar}
+        ${hoursBar}
+        <p class="sub-label" style="margin-top:5px;">${fp ? `${fp.done} of ${fp.total} features marked complete.${hp ? ` ${hp.actual}h logged out of ${hp.estimated}h estimated.` : ''}` : 'Feature data not yet available for this sprint.'}</p>
+        <div class="cards-grid">${d.cards.map(cardHTML).join('')}</div>`;
+        },
+
+        dataquality() {
+          const d = DATA.dataquality;
+          return `<div class="section-intro"><h2>${t('intro_dataquality_h')}</h2>
+        <p>${t('intro_dataquality_p')}</p></div>
+        ${kpis(d.kpis)}
+        <div class="cards-grid">${d.cards.map(cardHTML).join('')}</div>`;
+        },
+
+        risks() {
+          const d = DATA.risks;
+          return `<div class="section-intro"><h2>${t('intro_risks_h')}</h2>
+        <p>${t('intro_risks_p')}</p></div>
+        ${kpis(d.kpis)}
+        <div class="cards-grid">${d.cards.map(cardHTML).join('')}</div>`;
+        },
+
+        quality() {
+          const d = DATA.quality;
+          const cvgKpi = d.kpis.find(k => k.label === 'Test coverage');
+          const cvgPct = cvgKpi ? parseInt(cvgKpi.value) : 64;
+          const cvgStatus = cvgKpi ? cvgKpi.status : 'warn';
+          return `<div class="section-intro"><h2>${t('intro_quality_h')}</h2>
+        <p>${t('intro_quality_p')}</p></div>
+        ${kpis(d.kpis)}
+        ${progress(cvgPct, cvgStatus, `${t('Test coverage')} (target 80 %)`)}
+        <p class="sub-label" style="margin-top:5px;margin-bottom:18px;">Overall test coverage as of latest sprint</p>
+        <div class="cards-grid">${d.cards.map(cardHTML).join('')}</div>`;
+        },
+
+        ai() {                                                                                                                                                                                                         
+          const d = DATA.ai;                                                                                                                                                                                         
+          const narrative = d.narrative;                                                                                                                                                                             
+          return `<div class="section-intro"><h2>${t('intro_ai_h')}</h2>                                          
+          <p>${t('intro_ai_p')}</p></div>           
+          ${kpis(d.kpis)}                       
+          <div class="ai-narrative">${narrative}</div>                                                                                                                                                                 
+          ${sourcesBlock(d.sources_used)}`;                                                                                                                                                                            
+        }, 
+      };
+
+      /* ═══════════════════════════════════════════════
+         INTERACTIONS
+      ═══════════════════════════════════════════════ */
+
+
+      function openSource(id) {
+        const s = DATA.sources ? DATA.sources[id] : null;
+        if (!s) {
+          document.getElementById('source-modal-title').textContent = id || 'Source';
+          document.getElementById('source-modal-meta').innerHTML = `<strong>Source:</strong> ${id}<br/><strong>Type:</strong> Jira ticket referenced in analysis`;
+          document.getElementById('source-modal-body').innerHTML = `<div class="source-row"><strong>Ticket</strong>${id}</div>`;
+          document.getElementById('source-modal-overlay').classList.add('open');
+          return;
+        }
+        document.getElementById('source-modal-title').textContent = s.name;
+        document.getElementById('source-modal-meta').innerHTML =
+          `<strong>Tool:</strong> ${s.tool}<br/><strong>Location:</strong> ${s.location}<br/><strong>Accessed:</strong> ${s.accessed}`;
+        document.getElementById('source-modal-body').innerHTML =
+          s.rows.map(r => `<div class="source-row"><strong>${r.field}</strong>${r.value}</div>`).join('');
+        document.getElementById('source-modal-overlay').classList.add('open');
+      }                                                                                                                                                                                                              
+                                                                                                                                                                                                                 
+      function attachHandlers() {                                                                                                                                                                                    
+        // Card click → detail panel                                                                                                                                                                               
+        document.querySelectorAll('.card').forEach(el => {                                                                                                                                                         
+          el.addEventListener('click', () => {                                                                                                                                                                     
+            const c = allCards.find(x => x.id === el.dataset.card);                                                                                                                                                
+            if (!c) return;                                                                                                                                                                                        
+            document.getElementById('detail-title').textContent = c.title;                                                                                                                                         
+            document.getElementById('detail-body').innerHTML =
+              `${c.detail ? `<p style="margin-bottom:14px;color:var(--muted);">${c.detail.intro}</p>` : ''}
+             ${c.detail && c.detail.table ? renderTable(c.detail.table) : ''}
+             ${sourcesBlock(c.sources || [])}`;
+            const panel = document.getElementById('detail-panel');                                                                                                                                                 
+            panel.classList.add('open');                                                                                                                                                                           
+            panel.querySelectorAll('.source-badge, .row-src-btn').forEach(b => {                                                                                                                                   
+              b.addEventListener('click', e => { e.stopPropagation(); openSource(b.dataset.source); });                                                                                                            
+            });                                                                                                                                                                                                    
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });                                                                                                                                        
+          });                                                                                                                                                                                                      
+      });                                                                                                                                                                                                        
+                                                                                                                                                                                                                 
+      // Section-level source badges                                                                                                                                                                             
+      document.querySelectorAll('#main-content .source-badge').forEach(b => {                                                                                                                                    
+        b.addEventListener('click', () => openSource(b.dataset.source));                                                                                                                                         
+      });                                                                                                                                                                                                        
+  }                            
+
+      function renderTab(name) {
+        currentTab = name;
+        document.getElementById('main-content').innerHTML = tabs[name]();
+        document.getElementById('detail-panel').classList.remove('open');
+        attachHandlers();
+
+        if (name === 'overview') {
+          setTimeout(renderOverviewCharts, 50); // slight delay to ensure canvas is in DOM
+        }
+      }
+
+      function renderOverviewCharts() {
+        if (!window.Chart) return;
+
+        // 1. Budget Data Extraction
+        let budgetUsed = 165;
+        let budgetTotal = 200;
+        let burnKpi = null;
+
+        if (DATA.time && DATA.time.kpis) burnKpi = DATA.time.kpis.find(k => k.label.includes('Burn') || k.label.includes('Budget'));
+        if (!burnKpi && DATA.overview && DATA.overview.kpis) burnKpi = DATA.overview.kpis.find(k => k.label.includes('Burn') || k.label.includes('Budget'));
+
+        if (burnKpi && burnKpi.sub) {
+          const nums = burnKpi.sub.match(/\d+/g);
+          if (nums && nums.length >= 2) {
+            budgetUsed = parseInt(nums[0]);
+            budgetTotal = parseInt(nums[1]);
+          }
+        }
+        let budgetRemaining = Math.max(0, budgetTotal - budgetUsed);
+
+        const ctxBudget = document.getElementById('budget-chart');
+        if (ctxBudget) {
+          new Chart(ctxBudget, {
+            type: 'doughnut',
+            data: {
+              labels: ['Used (h)', 'Remaining (h)'],
+              datasets: [{
+                data: [budgetUsed, budgetRemaining],
+                backgroundColor: ['#f58962', '#e1d1c1'],
+                borderWidth: 0,
+                hoverOffset: 4
+              }]
+            },
+            options: {
+              maintainAspectRatio: false,
+              cutout: '75%',
+              plugins: {
+                legend: { position: 'bottom', labels: { font: { family: "'DM Sans', sans-serif", size: 11 } } }
+              }
+            }
+          });
+        }
+
+        // 2. Feature Data Extraction
+        let featDone = 4, featWip = 2, featPlan = 8;
+        if (DATA.features && DATA.features.kpis) {
+          const kDone = DATA.features.kpis.find(k => k.label.toLowerCase().includes('complete') || k.label.toLowerCase().includes('done'));
+          if (kDone) { const m = kDone.value.match(/\d+/); if (m) featDone = parseInt(m[0]); }
+          const kWip = DATA.features.kpis.find(k => k.label.toLowerCase().includes('progress') || k.label.toLowerCase().includes('wip'));
+          if (kWip) { const m = kWip.value.match(/\d+/); if (m) featWip = parseInt(m[0]); }
+          const kPlan = DATA.features.kpis.find(k => k.label.toLowerCase().includes('planned'));
+          if (kPlan) { const m = kPlan.value.match(/\d+/); if (m) featPlan = parseInt(m[0]); }
+        }
+
+        const ctxProgress = document.getElementById('progress-chart');
+        if (ctxProgress) {
+          new Chart(ctxProgress, {
+            type: 'bar',
+            data: {
+              labels: ['Done', 'In Progress', 'Planned'],
+              datasets: [{
+                data: [featDone, featWip, featPlan],
+                backgroundColor: ['#193837', '#f58962', '#e1d1c1'],
+                borderRadius: 6,
+                barPercentage: 0.6
+              }]
+            },
+            options: {
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f3f8' }, border: { display: false }, ticks: { precision: 0, font: { family: "'DM Sans', sans-serif" } } },
+                x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: "'DM Sans', sans-serif" } } }
+              }
+            }
+          });
+        }
+      }
+
+      /* ═══════════════════════════════════════════════
+         PRINT GENERATION
+      ═══════════════════════════════════════════════ */
+      const TAB_META = [
+        { key: 'overview', title: '📊 Overview', data: () => DATA.overview },
+        { key: 'time', title: '⏱ Time & Cost', data: () => DATA.time },
+        { key: 'features', title: '📋 Feature Progress', data: () => DATA.features },
+        { key: 'dataquality', title: '🔍 Data Quality', data: () => DATA.dataquality },
+        { key: 'risks', title: '⚠️ Risks & Alerts', data: () => DATA.risks },
+        { key: 'quality', title: '🔬 Quality', data: () => DATA.quality },
+        { key: 'ai', title: '🤖 AI Insights', data: () => DATA.ai },
+      ];
+
+      function trafficLight(status, label, reason) {
+        // status: 'green' | 'orange' | 'red'
+        return `<div class="tl-wrap">
+      <div class="tl-light">
+        <div class="tl-bulb red    ${status === 'red' ? 'active' : ''}"></div>
+        <div class="tl-bulb orange ${status === 'orange' ? 'active' : ''}"></div>
+        <div class="tl-bulb green  ${status === 'green' ? 'active' : ''}"></div>
+      </div>
+      <div class="tl-text">
+        <div class="tl-status ${status}">${label}</div>
+        <div class="tl-reason">${reason}</div>
+      </div>
+    </div>`;
+      }
+
+      function printTable_static(t) {
+        const hasRowSrc = t.rows.some(r => r.cells);
+        const thead = `<thead><tr>${t.headers.map(h => `<th>${h}</th>`).join('')}${hasRowSrc ? '<th>Source</th>' : ''}</tr></thead>`;
+        const tbody = `<tbody>${t.rows.map(r => {
+          const cells = r.cells || r;
+          const src = r.source;
+          const srcText = hasRowSrc ? `<td style="font-size:.72rem;color:#888;">${src && DATA.sources[src] ? DATA.sources[src].tool.split(' ')[0] : (src || '')}</td>` : '';
+          return `<tr>${cells.map(c => `<td>${c}</td>`).join('')}${srcText}</tr>`;
+        }).join('')}</tbody>`;
+        return `<table>${thead}${tbody}</table>`;
+      }
+
+      function printCard(c) {
+        const srcNames = (c.sources || []).map(id => DATA.sources[id] ? DATA.sources[id].name : id).join(' &nbsp;·&nbsp; ');
+        return `<div class="pc">
+      <div class="pc-head">
+        <strong>${c.title}</strong>
+        <span class="pb pb-${c.badge}">${c.badgeText}</span>
+      </div>
+      ${c.date ? `<div class="pc-date">${c.date}</div>` : ''}
+      <p class="pc-sum">${c.summary}</p>
+      ${c.detail ? `<p class="pc-intro">${c.detail.intro}</p>` : ''}
+      ${c.detail && c.detail.table ? printTable_static(c.detail.table) : ''}
+      <div class="pc-src">Sources: ${srcNames}</div>
+    </div>`;
+      }
+
+      function printKpisStatic(list) {
+        return `<div class="pk-row">${list.map(k => `<div class="pk"><div class="pk-label">${k.label}</div><div class="pk-val pk-${k.status}">${k.value}</div><div class="pk-sub">${k.sub}</div></div>`).join('')}</div>`;
+      }
+
+      function printSection(meta) {
+        const d = meta.data();
+        const cards = d.cards || [];
+        // Special handling for AI tab (narrative, no cards)
+        if (meta.key === 'ai') {
+          const srcNames = d.sources_used.map(id => DATA.sources[id] ? DATA.sources[id].name : id).join(' &nbsp;·&nbsp; ');
+          return `<section class="psec">
+        <h2>${meta.title}</h2>
+        ${printKpisStatic(d.kpis)}
+        <div class="pc-intro" style="margin-top:12px;">${d.narrative}</div>
+        <div class="pc-src" style="margin-top:16px;">Sources: ${srcNames}</div>
+      </section>`;
+        }
+        return `<section class="psec">
+      <h2>${meta.title}</h2>
+      ${printKpisStatic(d.kpis)}
+      ${cards.map(printCard).join('')}
+    </section>`;
+      }
+
+      const PRINT_CSS = `
+    body { font-family: Arial, sans-serif; font-size: 12px; color: #1e293b; margin: 0; padding: 0; }
+    h1   { font-size: 18px; margin-bottom: 2px; }
+    h2   { font-size: 14px; margin: 24px 0 10px; border-bottom: 2px solid #2563eb; padding-bottom: 4px; color: #2563eb; }
+    p    { color: #475569; margin: 4px 0; line-height: 1.5; }
+    .report-header { padding: 16px 24px; border-bottom: 2px solid #e2e6ee; margin-bottom: 16px; }
+    .report-meta   { font-size: 11px; color: #64748b; margin-top: 3px; }
+    .psec   { padding: 0 24px 8px; page-break-after: always; }
+    .psec:last-child { page-break-after: avoid; }
+    .pk-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .pk     { border: 1px solid #e2e6ee; border-radius: 6px; padding: 10px 14px; min-width: 130px; }
+    .pk-label { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+    .pk-val   { font-size: 18px; font-weight: 700; }
+    .pk-sub   { font-size: 9px; color: #64748b; margin-top: 1px; }
+    .pk-ok     { color: #16a34a; }
+    .pk-warn   { color: #d97706; }
+    .pk-danger { color: #dc2626; }
+    .pc     { border: 1px solid #e2e6ee; border-radius: 6px; padding: 12px 16px; margin-bottom: 12px; break-inside: avoid; }
+    .pc-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .pc-head strong { font-size: 12px; }
+    .pc-date { font-size: 10px; color: #64748b; margin-bottom: 4px; }
+    .pc-sum  { font-size: 11px; color: #475569; margin-bottom: 8px; }
+    .pc-intro { font-size: 11px; color: #475569; margin-bottom: 8px; }
+    .pc-src  { font-size: 9px; color: #94a3b8; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 6px; }
+    .pb      { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+    .pb-ok     { background: #dcfce7; color: #16a34a; }
+    .pb-warn   { background: #fef9c3; color: #d97706; }
+    .pb-danger { background: #fee2e2; color: #dc2626; }
+    .pb-info   { background: #eff4ff; color: #2563eb; }
+    table  { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 8px; }
+    th     { text-align: left; font-size: 9px; color: #64748b; border-bottom: 1px solid #e2e6ee; padding: 4px 8px; }
+    td     { padding: 5px 8px; border-bottom: 1px solid #f8fafc; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    @media print { @page { margin: 15mm; } }
+  `;
+
+      function openPrintWindow(sections) {
+        const header = `<div class="report-header">
+      <h1>${DATA.meta.projectName || 'Project Report'}</h1>
+      <div class="report-meta">Report generated: ${DATA.meta.reportDate || ''} &nbsp;·&nbsp; ${DATA.meta.sprintBadge || ''}</div>
+    </div>`;
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Cooperon AB — Project Status Report</title><style>${PRINT_CSS}</style></head><body>${header}${sections}</body></html>`;
+        const w = window.open('', '_blank');
+        w.document.write(html);
+        w.document.close();
+        w.focus();
+        setTimeout(() => w.print(), 400);
+      }
+
+      /* ═══════════════════════════════════════════════
+         WIRE-UP
+      ═══════════════════════════════════════════════ */
+      function applyI18n() {
+        document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+        document.querySelectorAll('[data-i18n-ver]').forEach(el => { el.textContent = t(el.dataset.i18nVer); });
+        document.getElementById('btn-print-tab').textContent = t('btn_print_tab');
+        document.getElementById('btn-print-all').textContent = t('btn_print_all');
+      }
+
+      document.querySelectorAll('.ver-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.ver-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          DATA = VERSIONS[btn.dataset.ver];
+          initHeader();
+          rebuildAllCards();
+          renderTab(currentTab);
+        });
+      });
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderTab(btn.dataset.tab);
+        });
+      });
+
+      document.getElementById('close-detail').addEventListener('click', () => {
+        document.getElementById('detail-panel').classList.remove('open');
+      });
+      document.getElementById('close-source').addEventListener('click', () => {
+      document.getElementById('source-modal-overlay').classList.remove('open');
+      });
+
+
+
+      let currentTab = 'overview';
+
+      document.getElementById('btn-print-tab').addEventListener('click', () => {
+        const meta = TAB_META.find(t => t.key === currentTab);
+        if (meta) openPrintWindow(printSection(meta));
+      });
+
+      document.getElementById('btn-print-all').addEventListener('click', () => {
+        openPrintWindow(TAB_META.map(printSection).join(''));
+      });
+
+      function initHeader() {
+        if (!DATA || !DATA.meta) return;
+        if (DATA.meta.projectName) document.getElementById('project-title').textContent = DATA.meta.projectName;
+        if (DATA.meta.reportDate) document.getElementById('report-date').textContent = DATA.meta.reportDate;
+        if (DATA.meta.sprintBadge) document.getElementById('sprint-badge').textContent = DATA.meta.sprintBadge;
+      }
+
+      initHeader();
+      renderTab('overview');
+    })();
+  </script>
+</body>
+
+</html>
