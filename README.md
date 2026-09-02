@@ -275,15 +275,13 @@ The report provides areas such as:
 
 ## Example Report
 
-## Example Report
-
 The demo below uses entirely fictional project data and represents a generated status report for a fictional client, **Cooperon AB**.
 
-![RECAP generated project status report](images/recap-demo-overview.png)
+![RECAP generated project status report](images/demo_rapport.png)
 
 To explore the full report and its interactive sections, open the demo below:
 
-**[Open the interactive RECAP demo report](RECAP-demo-report.html)**
+**[Open the interactive RECAP demo report](images/RECAP-demo-report.html)**
 
 ---
 
