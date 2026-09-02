@@ -1,6 +1,20 @@
-# RECAP — Report Engine for Cross-platform Analysis of Projects
+<div align="center">
 
-**Agentic project status reporting across Jira, Confluence, Azure DevOps and Tempo.**
+# RECAP
+### Report Engine for Cross-platform Analysis of Projects
+
+**Agentic project status reporting by synthesizing data across Jira, Confluence, Azure DevOps and Tempo.**
+
+<br>
+
+![Jira](https://img.shields.io/badge/Jira-0052CC?logo=jira&logoColor=white)
+![Confluence](https://img.shields.io/badge/Confluence-172B4D?logo=confluence&logoColor=white)
+![Azure DevOps](https://img.shields.io/badge/Azure_DevOps-0078D7?logo=azuredevops&logoColor=white)
+![Azure AI Foundry](https://img.shields.io/badge/Azure_AI_Foundry-0078D4?logo=microsoftazure&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agentic_AI-4B5563)
+![OAuth 2.0](https://img.shields.io/badge/OAuth_2.0-Authentication-EB5424)
+
+</div>
 
 RECAP is an LLM-powered project analytics and reporting system developed as a Bachelor of Science thesis project in Software Engineering and Management at the Department of Computer Science and Engineering, University of Gothenburg and Chalmers University of Technology.
 
