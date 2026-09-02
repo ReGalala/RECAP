@@ -43,33 +43,9 @@ This work gave me experience working across the full integration flow — from u
 
 
 ---
-
 ## How RECAP Works
 
-```text
-Jira ───────────────┐
-Confluence ─────────┤
-Azure DevOps ───────┼──► Data Collection
-Tempo ──────────────┘
-                           │
-                           ▼
-                     Data Processing
-                           │
-                           ▼
-                  Specialized LLM Agents
-                           │
-                           ▼
-                    Summary Agent
-                           │
-                           ▼
-                 Quality Assurance Agent
-                           │
-                           ▼
-                  Traceable HTML Report
-                           │
-                           ▼
-                       Confluence
-```
+![How RECAP works](images/how_it_works.drawio.png)
 
 The overall pipeline follows four main stages:
 
