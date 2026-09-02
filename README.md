@@ -281,7 +281,7 @@ The demo below uses entirely fictional project data and represents a generated s
 
 To explore the full report and its interactive sections, open the demo below:
 
-**[Open the interactive RECAP demo report](images/RECAP-demo-report.html)**
+**[Open the interactive RECAP demo report](https://regalala.github.io/RECAP/images/RECAP-demo-report.html)**
 
 ---
 
