@@ -16,6 +16,8 @@
 
 </div>
 
+---
+
 RECAP is an LLM-powered project analytics and reporting system developed as a Bachelor of Science thesis project in Software Engineering and Management at the Department of Computer Science and Engineering, University of Gothenburg and Chalmers University of Technology.
 
 The system collects fragmented project data from multiple development and project-management platforms, analyzes it using specialized LLM agents, and generates a traceable project status report directly inside **Confluence**.
